@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotterdam swimming times</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Verdana', sans-serif;
+            color: #007bff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            font-size: 1.6em;
+            font-weight: bold;
+            background-color: #4db8ff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .card-header:hover {
+            background-color: #3a8cb3;
+        }
+
+        .card-body {
+            display: none;
+            padding: 10px;
+            margin-top: 10px;
+            border-top: 2px solid #4db8ff;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .card-body.visible {
+            display: block;
+        }
+
+        .time-slot {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #f1faff;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            cursor: pointer; /* Makes the whole div clickable */
+        }
+
+        .time-slot:hover {
+            background-color: #e0f7fa;
+        }
+
+        .time-slot input {
+            margin-right: 10px;
+        }
+
+        .export-btn {
+            background-color: #28a745;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background-color: #218838;
+        }
+
+        .export-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                width: 100%;
+                margin: 10px;
+                padding: 15px; /* Slightly reduce padding for smaller screens */
+            }
+
+            .card-header {
+                font-size: 1.4em; /* Make the header slightly smaller */
+            }
+
+            .time-slot {
+                padding: 10px; /* Make time slots more compact */
+                font-size: 1em; /* Adjust font size for better readability */
+            }
+
+            .export-btn {
+                font-size: 1em; /* Reduce the button font size slightly */
+                padding: 10px 15px; /* Reduce padding for smaller screens */
+            }
+
+            h1 {
+                font-size: 2em; /* Adjust header font size */
+            }
+
+            .time-slot input {
+                transform: scale(1.5); /* Make checkboxes slightly bigger for easier clicking */
+            }
+        }
+    </style>
+    <script>
+        function toggleCardBody(cardId) {
+            const cardBody = document.getElementById(cardId);
+            cardBody.classList.toggle("visible");
+        }
+
+        function toggleCheckbox(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked; // Toggle checkbox state
+        }
+
+        function exportToCalendar() {
+            const checkboxes = document.querySelectorAll(".time-slot input:checked");
+            const selectedSlots = Array.from(checkboxes).map(checkbox => JSON.parse(checkbox.value));
+
+            if (selectedSlots.length === 0) {
+                alert("No time slots selected!");
+                return;
+            }
+
+            fetch("/export_calendar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ selected_slots: selectedSlots }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error("Failed to export calendar");
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "schedule.ics";
+                a.click();
+                URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Rotterdam swimming times</h1>
+
+    <div class="container">
+        {% for activity in activities %}
+            {# Check if the date is different from the previous activity #}
+            {% if loop.first or activity.date != activities[loop.index0 - 1].date %}
+                <div class="card">
+                    <div class="card-header" onclick="toggleCardBody('card-{{ activity.date }}')">
+                        {{ activity.date }}
+                    </div>
+                    <div id="card-{{ activity.date }}" class="card-body">
+            {% endif %}
+
+                    <!-- Time slot for the current date -->
+                    <div class="time-slot" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
+                        <label for="checkbox-{{ loop.index }}">
+                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}'>
+                            {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
+                        </label>
+                    </div>
+
+            {# Check if it's the last activity of the current date, then close the card #}
+            {% if loop.last or activity.date != activities[loop.index0 + 1].date %}
+                    </div> <!-- Close card-body for the current date -->
+                </div> <!-- Close card for the current date -->
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    <button class="export-btn" onclick="exportToCalendar()">Export Selected to Calendar</button>
+</body>
+</html>
