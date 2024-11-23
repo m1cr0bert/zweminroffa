@@ -29,21 +29,16 @@ def parse_date(date: str) -> str:
         parsed_date = parsed_date.replace(year=current_date.year + 1)
     else:
         parsed_date = parsed_date.replace(year=current_date.year)
-    return parsed_date.strftime("%Y-%m-%d")
+    return parsed_date
 
 
-def fetch_pool_data() -> List[dict]:
+def fetch_pool_data(locations: List[str]) -> List[dict]:
     """Fetches all the pool times for the 3 different pools in Rotterdam centre.
 
     Returns:
         List[dict]: List of all fetched times for the "Banenzwemmen" activity
         for Rotterdam pools. Includes start_time, end_time, location.
     """
-    locations = [
-        "zwemcentrum-rotterdam",
-        "sportcentrum-feijenoord",
-        "sportcentrum-west",
-    ]
     base_attr = "block-roster__program-item-"
     all_activities = []
 
@@ -68,7 +63,8 @@ def fetch_pool_data() -> List[dict]:
                         times = baan.find(attrs=base_attr + "time").text.strip()
                         all_activities.append(
                             {
-                                "date": date,
+                                "date": date.strftime("%Y-%m-%d"),
+                                "day": date.strftime("%A"),
                                 "location": location,
                                 "start_time": times[0:5],
                                 "end_time": times[8:13],
@@ -127,8 +123,13 @@ def create_ics_event(event: dict) -> str:
 
 @app.route("/")
 def index():
-    activities = fetch_pool_data()
-    return render_template("index.html", activities=activities)
+    locations = [
+        "zwemcentrum-rotterdam",
+        "sportcentrum-feijenoord",
+        "sportcentrum-west",
+    ]
+    activities = fetch_pool_data(locations=locations)
+    return render_template("index.html", activities=activities, locations=locations)
 
 
 @app.route("/export_calendar", methods=["POST"])

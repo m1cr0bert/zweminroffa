@@ -22,6 +22,15 @@
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         }
 
+        h3 {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Verdana', sans-serif;
+            color: #064992;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
         .card {
             background-color: #fff;
             border-radius: 8px;
@@ -107,7 +116,7 @@
             transform: scale(0.98);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 300px) {
             .card {
                 width: 100%;
                 margin: 10px;
@@ -186,22 +195,26 @@
 </head>
 <body>
     <h1>Rotterdam swimming times</h1>
-
+    <h3>
+    {% for location in locations %}
+        {{ location }}
+    {% endfor %}
+    </h3>
     <div class="container">
         {% for activity in activities %}
             {# Check if the date is different from the previous activity #}
             {% if loop.first or activity.date != activities[loop.index0 - 1].date %}
                 <div class="card">
                     <div class="card-header" onclick="toggleCardBody('card-{{ activity.date }}')">
-                        {{ activity.date }}
+                        {{ activity.day }} {{ activity.date }}
                     </div>
                     <div id="card-{{ activity.date }}" class="card-body">
             {% endif %}
 
                     <!-- Time slot for the current date -->
                     <div class="time-slot" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
-                        <label for="checkbox-{{ loop.index }}">
-                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}'>
+                        <label for="checkbox-{{ loop.index }}" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
+                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}' onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
                             {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
                         </label>
                     </div>
