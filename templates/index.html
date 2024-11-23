@@ -213,7 +213,7 @@
 
                     <!-- Time slot for the current date -->
                     <div class="time-slot" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
-                        <label for="checkbox-{{ loop.index }}" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
+                        <label for="checkbox-{{ loop.index }}">
                             <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}' onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
                             {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
                         </label>

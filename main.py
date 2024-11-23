@@ -52,6 +52,8 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
             for roster_day in soup.find_all(attrs={"class": "block-roster__day"}):
                 date = roster_day.find(attrs="block-roster__title").text.strip()
                 date = parse_date(date)
+                if date < datetime.now().date():
+                    continue
 
                 banenzwemmen = roster_day.find_all(
                     ["span", "a"],
@@ -63,7 +65,8 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
                         times = baan.find(attrs=base_attr + "time").text.strip()
                         all_activities.append(
                             {
-                                "date": date.strftime("%Y-%m-%d"),
+                                "date_for_sorting": date.strftime("%Y%m%d"),
+                                "date": date.strftime("%d-%m-%Y"),
                                 "day": date.strftime("%A"),
                                 "location": location,
                                 "start_time": times[0:5],
@@ -79,7 +82,7 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
         else:
             print(f"Fetching error for {location}.")
     # Sort all activities by date
-    all_activities.sort(key=lambda x: (x["date"], x["start_time"]))
+    all_activities.sort(key=lambda x: (x["date_for_sorting"], x["start_time"]))
     return all_activities
 
 
