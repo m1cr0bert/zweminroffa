@@ -1,5 +1,5 @@
 pytz
 requests
-beautifulsoup
+beautifulsoup4
 flask
 waitress
