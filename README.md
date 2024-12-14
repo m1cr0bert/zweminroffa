@@ -1,1 +1,1 @@
-Quick and dirty webapp for times of swimming pools in Rotterdam. 
+Quick and dirty webapp for opening times of swimming pools in Rotterdam. 
