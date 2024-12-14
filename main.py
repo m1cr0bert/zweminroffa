@@ -21,9 +21,9 @@ def parse_date(date: str) -> str:
     Returns:
         str: Parsed date in ymd format.
     """
-    date_format = "%A %d %B"
+    date_format = "%d %B"
     current_date = datetime.now()
-    parsed_date = datetime.strptime(date, date_format).date()
+    parsed_date = datetime.strptime(date.split(" ", 1)[1], date_format).date()
     if current_date.month == 12 and parsed_date.month == 1:
         # Shift the year by 1 if the date lies in january
         parsed_date = parsed_date.replace(year=current_date.year + 1)
