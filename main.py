@@ -21,9 +21,11 @@ def parse_date(date: str) -> str:
     Returns:
         str: Parsed date in ymd format.
     """
-    date_format = "%d %B"
+    date_format = "%d %b"
     current_date = datetime.now()
-    parsed_date = datetime.strptime(date.split(" ", 1)[1], date_format).date()
+    date_parts = date.split(" ")
+    day_month = f"{date_parts[1]} {date_parts[2][0:3]}"
+    parsed_date = datetime.strptime(day_month, date_format).date()
     if current_date.month == 12 and parsed_date.month == 1:
         # Shift the year by 1 if the date lies in january
         parsed_date = parsed_date.replace(year=current_date.year + 1)
@@ -96,7 +98,7 @@ def create_ics_event(event: dict) -> str:
         str: Calendar event in ics format
     """
     tz = pytz.timezone("Europe/Amsterdam")
-    event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
+    event_date = datetime.strptime(event["date"], "%d-%m-%Y").date()
     start_time = datetime.strptime(event["start_time"], "%H:%M").replace(
         year=event_date.year, month=event_date.month, day=event_date.day, tzinfo=tz
     )
