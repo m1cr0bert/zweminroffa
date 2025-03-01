@@ -11,7 +11,7 @@ from io import BytesIO
 from typing import List
 
 app = Flask(__name__)
-locale.setlocale(locale.LC_TIME, "nl_NL")
+locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
 
 def parse_date(date: str) -> str:
     """Parses dates from text to datetimes
