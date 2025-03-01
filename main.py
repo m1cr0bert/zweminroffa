@@ -1,4 +1,3 @@
-import locale
 import pytz
 import re
 import requests
@@ -6,12 +5,12 @@ import uuid
 
 from bs4 import BeautifulSoup
 from datetime import datetime
+from babel.dates import get_month_names
 from flask import Flask, render_template, request, jsonify, send_file
 from io import BytesIO
 from typing import List
 
 app = Flask(__name__)
-locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
 
 def parse_date(date: str) -> str:
     """Parses dates from text to datetimes
@@ -22,11 +21,16 @@ def parse_date(date: str) -> str:
     Returns:
         str: Parsed date in ymd format.
     """
-    date_format = "%d %B"
+    date_format = "%d %m"
     current_date = datetime.now()
     date_parts = date.split(" ")
-    day_month = f"{date_parts[1]} {date_parts[2]}"
-    parsed_date = datetime.strptime(day_month, date_format).date()
+    day = date_parts[1]
+    month_name = date_parts[2].lower()
+    month_names = get_month_names(width="wide", locale="nl_NL")
+    month_map = {name.lower(): idx for idx, name in month_names.items()} 
+    month = month_map[month_name]
+    parsed_date = datetime.strptime(f"{day} {month}", date_format).date()
+    # parsed_date = datetime.strptime(day_month, date_format).date()
     if current_date.month == 12 and parsed_date.month == 1:
         # Shift the year by 1 if the date lies in january
         parsed_date = parsed_date.replace(year=current_date.year + 1)
