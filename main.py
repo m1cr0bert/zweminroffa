@@ -1,3 +1,4 @@
+import locale
 import pytz
 import re
 import requests
@@ -10,7 +11,7 @@ from io import BytesIO
 from typing import List
 
 app = Flask(__name__)
-
+locale.setlocale(locale.LC_TIME, "nl_NL")
 
 def parse_date(date: str) -> str:
     """Parses dates from text to datetimes
@@ -21,10 +22,10 @@ def parse_date(date: str) -> str:
     Returns:
         str: Parsed date in ymd format.
     """
-    date_format = "%d %b"
+    date_format = "%d %B"
     current_date = datetime.now()
     date_parts = date.split(" ")
-    day_month = f"{date_parts[1]} {date_parts[2][0:3]}"
+    day_month = f"{date_parts[1]} {date_parts[2]}"
     parsed_date = datetime.strptime(day_month, date_format).date()
     if current_date.month == 12 and parsed_date.month == 1:
         # Shift the year by 1 if the date lies in january
