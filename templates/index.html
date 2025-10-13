@@ -7,19 +7,39 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: #e0f7fa;
+            background: linear-gradient(to bottom, #b3e0ff 0%, #e0f7fa 100%);
             margin: 0;
             padding: 20px;
             color: #333;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Wave SVG background */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 220px;
+            background: url('data:image/svg+xml;utf8,<svg width="100%" height="220" xmlns="http://www.w3.org/2000/svg"><path d="M0,60 C150,180 350,0 600,60 C850,120 1050,20 1200,60 L1200,220 L0,220 Z" fill="%23007bff" fill-opacity="0.15"/></svg>');
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: 0;
         }
 
         h1 {
-            font-size: 2.5em;
+            font-size: 2.7em;
             text-align: center;
             margin-bottom: 20px;
             font-family: 'Verdana', sans-serif;
             color: #007bff;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 8px rgba(0, 123, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 2px;
         }
 
         h3 {
@@ -28,47 +48,70 @@
             margin-bottom: 20px;
             font-family: 'Verdana', sans-serif;
             color: #064992;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 5px rgba(0, 123, 255, 0.15);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
         }
 
         .card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            margin: 20px;
-            padding: 20px;
+            background: linear-gradient(135deg, #e0f7fa 60%, #b3e0ff 100%);
+            border-radius: 16px;
+            box-shadow: 0px 6px 18px rgba(0, 123, 255, 0.10);
+            margin: 24px;
+            padding: 22px;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #4db8ff33;
+            position: relative;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            width: 80px;
+            height: 20px;
+            background: radial-gradient(circle, #4db8ff33 60%, transparent 100%);
+            opacity: 0.5;
+            z-index: 0;
         }
 
         .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0px 12px 32px rgba(0, 123, 255, 0.18);
+            border-color: #007bff55;
         }
 
         .card-header {
             font-size: 1.6em;
             font-weight: bold;
-            background-color: #4db8ff;
+            background: linear-gradient(90deg, #4db8ff 70%, #007bff 100%);
             color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 18px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background 0.3s;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.08);
         }
 
         .card-header:hover {
-            background-color: #3a8cb3;
+            background: linear-gradient(90deg, #007bff 60%, #4db8ff 100%);
         }
 
         .card-body {
             display: none;
-            padding: 10px;
-            margin-top: 10px;
+            padding: 12px;
+            margin-top: 12px;
             border-top: 2px solid #4db8ff;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+            background: linear-gradient(90deg, #f1faff 80%, #e0f7fa 100%);
+            border-radius: 8px;
         }
 
         .card-body.visible {
@@ -76,73 +119,85 @@
         }
 
         .time-slot {
-            margin: 10px 0;
-            padding: 12px;
-            background-color: #f1faff;
-            border-radius: 5px;
+            margin: 12px 0;
+            padding: 14px;
+            background: linear-gradient(90deg, #e3f6fd 80%, #b3e0ff 100%);
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.3s ease;
-            cursor: pointer; /* Makes the whole div clickable */
+            transition: background 0.3s;
+            cursor: pointer;
+            border: 1px solid #4db8ff22;
+            box-shadow: 0 1px 4px rgba(0,123,255,0.07);
         }
 
         .time-slot:hover {
-            background-color: #e0f7fa;
+            background: linear-gradient(90deg, #b3e0ff 80%, #e0f7fa 100%);
+            border-color: #007bff33;
         }
 
         .time-slot input {
             margin-right: 10px;
+            accent-color: #007bff;
         }
 
         .export-btn {
-            background-color: #28a745;
+            background: linear-gradient(90deg, #28a745 70%, #4db8ff 100%);
             border: none;
             color: white;
-            padding: 12px 20px;
+            padding: 14px 22px;
             font-size: 1.2em;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
-            margin-top: 30px;
-            transition: background-color 0.3s ease;
+            margin-top: 36px;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(40,167,69,0.08);
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
         .export-btn:hover {
-            background-color: #218838;
+            background: linear-gradient(90deg, #218838 70%, #007bff 100%);
         }
 
         .export-btn:active {
             transform: scale(0.98);
         }
 
+        /* Water ripple effect for cards */
+        @keyframes ripple {
+            0% { box-shadow: 0 0 0 0 rgba(0,123,255,0.15); }
+            70% { box-shadow: 0 0 0 10px rgba(0,123,255,0.05); }
+            100% { box-shadow: 0 0 0 0 rgba(0,123,255,0.0); }
+        }
+        .card:hover {
+            animation: ripple 0.7s;
+        }
+
         @media (max-width: 300px) {
             .card {
                 width: 100%;
                 margin: 10px;
-                padding: 15px; /* Slightly reduce padding for smaller screens */
+                padding: 15px;
             }
-
             .card-header {
-                font-size: 1.4em; /* Make the header slightly smaller */
+                font-size: 1.4em;
             }
-
             .time-slot {
-                padding: 10px; /* Make time slots more compact */
-                font-size: 1em; /* Adjust font size for better readability */
+                padding: 10px;
+                font-size: 1em;
             }
-
             .export-btn {
-                font-size: 1em; /* Reduce the button font size slightly */
-                padding: 10px 15px; /* Reduce padding for smaller screens */
+                font-size: 1em;
+                padding: 10px 15px;
             }
-
             h1 {
-                font-size: 2em; /* Adjust header font size */
+                font-size: 2em;
             }
-
             .time-slot input {
-                transform: scale(1.5); /* Make checkboxes slightly bigger for easier clicking */
+                transform: scale(1.5);
             }
         }
     </style>
@@ -197,7 +252,7 @@
     <h1>Rotterdam swimming times</h1>
     <h3>
     {% for location in locations %}
-        {{ location }}
+        🏊🏻‍♀️ {{ location }} 🏊🏻‍♀️ <br>
     {% endfor %}
     </h3>
     <div class="container">
@@ -212,9 +267,9 @@
             {% endif %}
 
                     <!-- Time slot for the current date -->
-                    <div class="time-slot" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
-                        <label for="checkbox-{{ loop.index }}">
-                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}' onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
+                    <div class="time-slot">
+                        <label for="checkbox-{{ loop.index }}" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
+                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}'>
                             {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
                         </label>
                     </div>
