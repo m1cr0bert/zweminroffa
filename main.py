@@ -102,6 +102,12 @@ def create_ics_event(event: dict) -> str:
     Returns:
         str: Calendar event in ics format
     """
+    locations = {
+        "zwemcentrum-rotterdam": "Zwemcentrum Rotterdam Annie M G Schmidtplein 8, 3083 NZ Rotterdam, Netherlands",
+        "sportcentrum-feijenoord": "Sportcentrum Feijenoord Laan op Zuid 1055, 3072 DB Rotterdam, Netherlands",
+        "sportcentrum-west": "Sportcentrum West Spaanseweg 4, 3028 HW Rotterdam, Netherlands",
+    }
+    
     tz = pytz.timezone("Europe/Amsterdam")
     event_date = datetime.strptime(event["date"], "%d-%m-%Y").date()
     start_time = datetime.strptime(event["start_time"], "%H:%M").replace(
@@ -119,7 +125,7 @@ def create_ics_event(event: dict) -> str:
         f"DTSTART:{start_time.strftime('%Y%m%dT%H%M%S')}\n"
         f"DTEND:{end_time.strftime('%Y%m%dT%H%M%S')}\n"
         f"SUMMARY:{event['activity']}\n"
-        f"LOCATION:{event['location']}\n"
+        f"LOCATION:{locations.get(event['location'], event['location'])}\n"
         f"DESCRIPTION:{event['activity']}\n"
         "BEGIN:VALARM\n"
         "TRIGGER:-PT15M\n"
