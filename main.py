@@ -2,6 +2,7 @@ import pytz
 import re
 import requests
 import uuid
+import random
 
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -92,6 +93,21 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
     all_activities.sort(key=lambda x: (x["date_for_sorting"], x["start_time"]))
     return all_activities
 
+def get_swim_quote():
+    swim_quotes = [
+        '"The water is your friend. You don`t have to fight with water, just share the same spirit as the water, and it will help you move." — Alexandr Popov',
+        '"Just keep swimming." — Dory (Finding Nemo)',
+        '"The harder you work, the harder it is to surrender." — Vince Lombardi',
+        '"Don`t wait for your ship to come in - swim out to it." — Unknown',
+        '"If you want to be the best, you have to do things that other people aren`t willing to do." — Michael Phelps',
+        '"Swimming is more than a sport; it`s a way of life." — Unknown',
+        '"The pool is my happy place." — Unknown',
+        '"Winners never quit and quitters never win." — Vince Lombardi',
+        '"Believe in yourself, take on your challenges, dig deep within yourself to conquer fears." — Chantal Sutherland',
+        '"Success is not final, failure is not fatal: It is the courage to continue that counts." — Winston Churchill',
+    ]
+    return random.choice(swim_quotes)
+
 
 def create_ics_event(event: dict) -> str:
     """Create calendar events for the selected time slots
@@ -103,9 +119,9 @@ def create_ics_event(event: dict) -> str:
         str: Calendar event in ics format
     """
     locations = {
-        "zwemcentrum-rotterdam": "Zwemcentrum Rotterdam Annie M G Schmidtplein 8, 3083 NZ Rotterdam, Netherlands",
-        "sportcentrum-feijenoord": "Sportcentrum Feijenoord Laan op Zuid 1055, 3072 DB Rotterdam, Netherlands",
-        "sportcentrum-west": "Sportcentrum West Spaanseweg 4, 3028 HW Rotterdam, Netherlands",
+        "zwemcentrum-rotterdam": """Annie M G Schmidtplein 8\, 3083 NZ Rotterdam\, Netherlands""",
+        "sportcentrum-feijenoord": "Laan op Zuid 1055\, 3072 DB Rotterdam\, Netherlands",
+        "sportcentrum-west": "Spaanseweg 4\, 3028 HW Rotterdam\, Netherlands",
     }
     
     tz = pytz.timezone("Europe/Amsterdam")
@@ -124,12 +140,11 @@ def create_ics_event(event: dict) -> str:
         f"DTSTAMP:{start_time.strftime('%Y%m%dT%H%M%S')}\n"
         f"DTSTART:{start_time.strftime('%Y%m%dT%H%M%S')}\n"
         f"DTEND:{end_time.strftime('%Y%m%dT%H%M%S')}\n"
-        f"SUMMARY:{event['activity']}\n"
+        f"SUMMARY:Banenzwemmen {event['location']}\n"
         f"LOCATION:{locations.get(event['location'], event['location'])}\n"
-        f"DESCRIPTION:{event['activity']}\n"
+        f"DESCRIPTION:{get_swim_quote()}. {event['activity']}\n"
         "BEGIN:VALARM\n"
         "TRIGGER:-PT15M\n"
-        "DESCRIPTION:Swimming time! :)\n"
         "ACTION:DISPLAY\n"
         "END:VALARM\n"
         "END:VEVENT\n"
