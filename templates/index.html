@@ -118,6 +118,21 @@
             display: block;
         }
 
+        .card-footer {
+            background: linear-gradient(90deg, #e0f7fa 80%, #b3e0ff 100%);
+            border-top: 1px solid #4db8ff33;
+            border-radius: 0 0 12px 12px;
+            padding: 12px 18px;
+            font-size: 1.05em;
+            color: #007bff;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.05);
+            margin-top: 8px;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
         .time-slot {
             margin: 12px 0;
             padding: 14px;
@@ -209,7 +224,7 @@
 
         function toggleCheckbox(checkboxId) {
             const checkbox = document.getElementById(checkboxId);
-            checkbox.checked = !checkbox.checked; // Toggle checkbox state
+            checkbox.checked = !checkbox.checked;
         }
 
         function exportToCalendar() {
@@ -265,18 +280,20 @@
                     </div>
                     <div id="card-{{ activity.date }}" class="card-body">
             {% endif %}
-
-                    <!-- Time slot for the current date -->
-                    <div class="time-slot">
-                        <label for="checkbox-{{ loop.index }}" onclick="toggleCheckbox('checkbox-{{ loop.index }}')">
-                            <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}'>
-                            {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
-                        </label>
-                    </div>
+            <!-- Time slot for the current date -->
+            <div class="time-slot" onclick="if(event.target.tagName !== 'INPUT'){ toggleCheckbox('checkbox-{{ loop.index }}'); }">
+                <label for="checkbox-{{ loop.index }}" style="cursor:pointer;">
+                    <input type="checkbox" id="checkbox-{{ loop.index }}" value='{{ activity | tojson }}'>
+                    {{ activity.start_time }} - {{ activity.end_time }}: {{ activity.activity }} ({{ activity.location }})
+                </label>
+            </div>
 
             {# Check if it's the last activity of the current date, then close the card #}
             {% if loop.last or activity.date != activities[loop.index0 + 1].date %}
                     </div> <!-- Close card-body for the current date -->
+                <div class="card-footer" onclick="toggleCardBody('card-{{ activity.date }}')">
+                    {{ activity.fun_fact }}
+                </div>
                 </div> <!-- Close card for the current date -->
             {% endif %}
         {% endfor %}

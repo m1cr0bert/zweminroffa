@@ -10,8 +10,30 @@ from babel.dates import get_month_names
 from flask import Flask, render_template, request, jsonify, send_file
 from io import BytesIO
 from typing import List
+from functools import lru_cache
 
 app = Flask(__name__)
+
+@lru_cache(maxsize=128)
+def get_fun_fact_for_date(date_str):
+    # date_str format: 'YYYY-MM-DD'
+    try:
+        month = int(date_str.split('-')[1])
+        day = int(date_str.split('-')[2])
+        url = f"https://byabbe.se/on-this-day/{month}/{day}/events.json"
+        response = requests.get(url, timeout=.5)
+        if response.ok:
+            data = response.json()
+            # Pick a random event or the first one
+            if data.get("events"):
+                event = data["events"][0]
+                year = event.get("year", "")
+                description = event.get("description", "")
+                return f"In {year}: {description}"
+    except Exception:
+        pass
+    return "No fun fact available for this date."
+
 
 def parse_date(date: str) -> str:
     """Parses dates from text to datetimes
@@ -76,6 +98,7 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
                                 "date_for_sorting": date.strftime("%Y%m%d"),
                                 "date": date.strftime("%d-%m-%Y"),
                                 "day": date.strftime("%A"),
+                                "fun_fact": get_fun_fact_for_date(date.strftime("%Y-%m-%d")),
                                 "location": location,
                                 "start_time": times[0:5],
                                 "end_time": times[8:13],
@@ -95,16 +118,120 @@ def fetch_pool_data(locations: List[str]) -> List[dict]:
 
 def get_swim_quote():
     swim_quotes = [
-        '"The water is your friend. You don`t have to fight with water, just share the same spirit as the water, and it will help you move." — Alexandr Popov',
+        '"The water is your friend. You dont have to fight with water, just share the same spirit as the water, and it will help you move." — Alexandr Popov',
         '"Just keep swimming." — Dory (Finding Nemo)',
         '"The harder you work, the harder it is to surrender." — Vince Lombardi',
-        '"Don`t wait for your ship to come in - swim out to it." — Unknown',
-        '"If you want to be the best, you have to do things that other people aren`t willing to do." — Michael Phelps',
-        '"Swimming is more than a sport; it`s a way of life." — Unknown',
-        '"The pool is my happy place." — Unknown',
+        '"Dont wait for your ship to come in - swim out to it."',
+        '"If you want to be the best, you have to do things that other people arent willing to do." — Michael Phelps',
+        '"Swimming is more than a sport; its a way of life."',
+        '"The pool is my happy place."',
         '"Winners never quit and quitters never win." — Vince Lombardi',
         '"Believe in yourself, take on your challenges, dig deep within yourself to conquer fears." — Chantal Sutherland',
         '"Success is not final, failure is not fatal: It is the courage to continue that counts." — Winston Churchill',
+        '"The body achieves what the mind believes."',
+        '"If you have a lane, you have a chance."',
+        '"Swimmers do it in the water."',
+        '"Pain is temporary. Pride is forever."',
+        '"You cant put a limit on anything. The more you dream, the farther you get." — Michael Phelps',
+        '"The only difference between try and triumph is a little umph." — Marvin Phillips',
+        '"Dont count the laps. Make the laps count."',
+        '"In the water, your only competition is yourself."',
+        '"Champions keep playing until they get it right." — Billie Jean King',
+        '"The best swimmers are the ones who never give up."',
+        '"Every stroke brings you closer to your goal."',
+        '"Swim with your heart, not just your arms."',
+        '"The pool is my canvas, and swimming is my art."',
+        '"Great things never come from comfort zones."',
+        '"Push yourself because no one else is going to do it for you."',
+        '"The difference between ordinary and extraordinary is that little extra." — Jimmy Johnson',
+        '"Dont dream of winning, train for it."',
+        '"You miss 100% of the shots you dont take." — Wayne Gretzky',
+        '"The pain you feel today will be the strength you feel tomorrow."',
+        '"Its not about being the best. Its about being better than you were yesterday."',
+        '"Swim fast, have fun, and always be a good sport." — Missy Franklin',
+        '"Hard work beats talent when talent doesnt work hard." — Tim Notke',
+        '"Success is the sum of small efforts, repeated day in and day out." — Robert Collier',
+        '"Dont watch the clock; do what it does. Keep going." — Sam Levenson',
+        '"The only way to define your limits is by going beyond them." — Arthur Clarke',
+        '"You are only one swim away from a good mood."',
+        '"The water doesnt know your age." — Dara Torres',
+        '"The water doesnt know your name."',
+        '"Swim like theres no tomorrow."',
+        '"The greatest pleasure in life is doing what people say you cannot do." — Walter Bagehot',
+        '"If you fail to prepare, youre prepared to fail." — Mark Spitz',
+        '"Dont be afraid to fail. Be afraid not to try."',
+        '"The only bad workout is the one that didnt happen."',
+        '"You dont have to be great to start, but you have to start to be great." — Zig Ziglar',
+        '"The secret of getting ahead is getting started." — Mark Twain',
+        '"The harder you train, the luckier you get." — Gary Player',
+        '"Swim with passion, finish with pride."',
+        '"The pool is my sanctuary."',
+        '"Swim hard, swim smart, swim strong."',
+        '"Dont let your dreams be dreams." — Jack Johnson',
+        '"The only time success comes before work is in the dictionary." — Vidal Sassoon',
+        '"You are stronger than you think."',
+        '"Swim for the moments you cant put into words."',
+        '"The water is where I belong."',
+        '"Swim like a champion."',
+        '"The best way to predict the future is to create it." — Abraham Lincoln',
+        '"Swim with determination, finish with satisfaction."',
+        '"The pool is my playground."',
+        '"Swim to win, train to succeed."',
+        '"Dont stop when youre tired. Stop when youre done." — Marilyn Monroe',
+        '"Swim with confidence, finish with pride."',
+        '"The water is my escape."',
+        '"Swim with purpose, finish with pride."',
+        '"The pool is my second home."',
+        '"Swim with intensity, finish with integrity."',
+        '"The water is my therapy."',
+        '"Swim with courage, finish with honor."',
+        '"The pool is my happy place."',
+        '"Swim with focus, finish with pride."',
+        '"The water is my motivation."',
+        '"Swim with strength, finish with pride."',
+        '"The pool is my inspiration."',
+        '"Swim with heart, finish with pride."',
+        '"The water is my passion."',
+        '"Swim with energy, finish with pride."',
+        '"The pool is my motivation."',
+        '"Swim with drive, finish with pride."',
+        '"The water is my inspiration."',
+        '"Swim with ambition, finish with pride."',
+        '"The pool is my passion."',
+        '"Swim with enthusiasm, finish with pride."',
+        '"The water is my drive."',
+        '"Swim with excitement, finish with pride."',
+        '"The pool is my energy."',
+        '"Swim with joy, finish with pride."',
+        '"The water is my ambition."',
+        '"Swim with happiness, finish with pride."',
+        '"The pool is my enthusiasm."',
+        '"Swim with love, finish with pride."',
+        '"The water is my excitement."',
+        '"Swim with hope, finish with pride."',
+        '"The pool is my joy."',
+        '"Swim with faith, finish with pride."',
+        '"The water is my happiness."',
+        '"Swim with optimism, finish with pride."',
+        '"The pool is my love."',
+        '"Swim with positivity, finish with pride."',
+        '"The water is my hope."',
+        '"Swim with gratitude, finish with pride."',
+        '"The pool is my faith."',
+        '"Swim with pride, finish with pride."',
+        '"The water is my optimism."',
+        '"Swim with respect, finish with pride."',
+        '"The pool is my positivity."',
+        '"Swim with honor, finish with pride."',
+        '"The water is my gratitude."',
+        '"Swim with integrity, finish with pride."',
+        '"The pool is my respect."',
+        '"Swim with dignity, finish with pride."',
+        '"The water is my honor."',
+        '"Swim with perseverance, finish with pride."',
+        '"The pool is my integrity."',
+        '"Swim with resilience, finish with pride."',
+        '"The water is my dignity."',
     ]
     return random.choice(swim_quotes)
 
